@@ -16,6 +16,7 @@
     <ul>
       <li><a href="#add_qa_head_repo">add_qa_head_repo</a></li>
       <li><a href="#add_qa_web_repo">add_qa_web_repo</a></li>
+      <li><a href="#get_installed_patterns">get_installed_patterns</a></li>
       <li><a href="#get_repo_var_name">get_repo_var_name</a></li>
       <li><a href="#smt_wizard">smt_wizard</a></li>
       <li><a href="#get_repo_var_name1">get_repo_var_name</a></li>
@@ -33,6 +34,7 @@
       <li><a href="#validate_repo_properties">validate_repo_properties</a></li>
       <li><a href="#parse_repo_data">parse_repo_data</a></li>
       <li><a href="#verify_software">verify_software</a></li>
+      <li><a href="#"></a></li>
     </ul>
   </li>
 </ul><h1>lib/repo_tools.pm</h1>
@@ -97,6 +99,18 @@
 <li><p>generate_version</p>
 
 </li>
+<li><p>validate_repo_properties</p>
+
+</li>
+<li><p>parse_repo_data</p>
+
+</li>
+<li><p>verify_software</p>
+
+</li>
+<li><p>validate_install_repo</p>
+
+</li>
 </ul>
 
 <h2 id="add_qa_head_repo">add_qa_head_repo</h2>
@@ -110,6 +124,14 @@
 <pre><code> add_qa_web_repo();</code></pre>
 
 <p>Helper to add QA web repository repository. This repository is *not* mandatory.</p>
+
+<h2 id="get_installed_patterns">get_installed_patterns</h2>
+
+<pre><code> get_installed_patterns();</code></pre>
+
+<p>Here zypper uses XML as output format for more precise parsing (by using &#39;-x&#39; command parameter). Then the names of patterns are parsed from the XML.</p>
+
+<p>Returns array containing all installed patterns in the system.</p>
 
 <h2 id="get_repo_var_name">get_repo_var_name</h2>
 
@@ -216,6 +238,10 @@
 <pre><code> verify_software(%args);</code></pre>
 
 <p>Validates that package or pattern is installed, or not installed and/or if package is available in the given repo. returns string with error or empty string in case of matching expectations. <code>%args</code> should have following keys defined: - <code>name</code>: package or pattern name - <code>installed</code>: if set to true, validate that package or pattern is installed - <code>pattern</code>: set to true if is pattern, otherwise validating package - <code>available</code>: if set to true, validate that package or pattern is available in the list of packages with given search criteria, otherwise expect zypper command to fail - <code>repo</code>: Optional, name of the repo where the package should be available. Check is triggered only if <code>available</code> is set to true</p>
+
+<h2 id=""></h2>
+
+<p>Verify that install repo <code>mirror</code> corresponds to the one expected one.</p>
 
 
 </body>

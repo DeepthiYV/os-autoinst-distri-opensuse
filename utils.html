@@ -28,6 +28,8 @@
       <li><a href="#type_string_slow_extended">type_string_slow_extended</a></li>
       <li><a href="#type_string_slow">type_string_slow</a></li>
       <li><a href="#type_string_very_slow">type_string_very_slow</a></li>
+      <li><a href="#enter_cmd_slow">enter_cmd_slow</a></li>
+      <li><a href="#enter_cmd_very_slow">enter_cmd_very_slow</a></li>
       <li><a href="#get_netboot_mirror">get_netboot_mirror</a></li>
       <li><a href="#zypper_call">zypper_call</a></li>
       <li><a href="#zypper_enable_install_dvd">zypper_enable_install_dvd</a></li>
@@ -36,6 +38,7 @@
       <li><a href="#ssh_fully_patch_system">ssh_fully_patch_system</a></li>
       <li><a href="#minimal_patch_system">minimal_patch_system</a></li>
       <li><a href="#zypper_search">zypper_search</a></li>
+      <li><a href="#set_zypper_lock_timeout">set_zypper_lock_timeout</a></li>
       <li><a href="#workaround_type_encrypted_passphrase">workaround_type_encrypted_passphrase</a></li>
       <li><a href="#is_boot_encrypted">is_boot_encrypted</a></li>
       <li><a href="#is_bridged_networking">is_bridged_networking</a></li>
@@ -45,6 +48,7 @@
       <li><a href="#handle_livecd_reboot_failure">handle_livecd_reboot_failure</a></li>
       <li><a href="#assert_screen_with_soft_timeout">assert_screen_with_soft_timeout</a></li>
       <li><a href="#quit_packagekit">quit_packagekit</a></li>
+      <li><a href="#wait_for_purge_kernels">wait_for_purge_kernels</a></li>
       <li><a href="#addon_decline_license">addon_decline_license</a></li>
       <li><a href="#addon_license">addon_license</a></li>
       <li><a href="#addon_products_is_applicable">addon_products_is_applicable</a></li>
@@ -62,18 +66,29 @@
       <li><a href="#exec_and_insert_password">exec_and_insert_password</a></li>
       <li><a href="#shorten_url">shorten_url</a></li>
       <li><a href="#handle_login_not_found">_handle_login_not_found</a></li>
+      <li><a href="#handle_firewall">_handle_firewall</a></li>
       <li><a href="#reconnect_mgmt_console">reconnect_mgmt_console</a></li>
       <li><a href="#show_tasks_in_blocked_state">show_tasks_in_blocked_state</a></li>
       <li><a href="#show_oom_info">show_oom_info</a></li>
       <li><a href="#svirt_host_basedir">svirt_host_basedir</a></li>
       <li><a href="#script_retry">script_retry</a></li>
       <li><a href="#script_output_retry">script_output_retry</a></li>
+      <li><a href="#validate_script_output_retry">validate_script_output_retry</a></li>
       <li><a href="#script_run_interactive">script_run_interactive</a></li>
       <li><a href="#create_btrfs_subvolume">create_btrfs_subvolume</a></li>
+      <li><a href="#create_raid_loop_device">create_raid_loop_device</a></li>
       <li><a href="#file_content_replace">file_content_replace</a></li>
       <li><a href="#assert_file_content-assert_file_content-path-value">assert_file_content assert_file_content( &quot;path&quot;, value );</a></li>
       <li><a href="#ensure_ca_certificates_suse_installed-ensure_ca_certificates_suse_installed">ensure_ca_certificates_suse_installed ensure_ca_certificates_suse_installed();</a></li>
       <li><a href="#install_patterns-install_patterns">install_patterns install_patterns();</a></li>
+      <li><a href="#permit_root_ssh-permit_root_ssh">permit_root_ssh permit_root_ssh();</a></li>
+      <li><a href="#permit_root_ssh_in_sol-permit_root_ssh_in_sol">permit_root_ssh_in_sol permit_root_ssh_in_sol();</a></li>
+      <li><a href="#cleanup_disk_space-cleanup_disk_space">cleanup_disk_space cleanup_disk_space();</a></li>
+      <li><a href="#package_upgrade_check-package_upgrade_check">package_upgrade_check package_upgrade_check();</a></li>
+      <li><a href="#validate_result-_validate_result">_validate_result _validate_result();</a></li>
+      <li><a href="#generate_results-generate_results">generate_results generate_results();</a></li>
+      <li><a href="#pars_results-pars_results">pars_results pars_results();</a></li>
+      <li><a href="#test_case-test_case-name-description-result">test_case test_case($name, $description, $result);</a></li>
     </ul>
   </li>
 </ul><h1>lib/utils.pm</h1>
@@ -191,6 +206,18 @@
 
 <p>The bootloader prompt line is very delicate with typing especially when scrolling. We are typing very slow but this could still pose problems when the worker host is utilized so better wait until the string is displayed before continuing For the special winter grub screen with moving penguins <code>wait_still_screen</code> does not work so we just revert to sleeping a bit instead of waiting for a still screen which is never happening. Sleeping for 3 seconds is less waste of time than waiting for the <code>wait_still_screen</code> to timeout, especially because <code>wait_still_screen</code> is also scaled by <code>TIMEOUT_SCALE</code> which we do not need here.</p>
 
+<h2 id="enter_cmd_slow">enter_cmd_slow</h2>
+
+<pre><code> enter_cmd_slow($cmd);</code></pre>
+
+<p>Enter a command with <code>SLOW_TYPING_SPEED</code> to avoid losing keys.</p>
+
+<h2 id="enter_cmd_very_slow">enter_cmd_very_slow</h2>
+
+<pre><code> enter_cmd_very_slow($cmd);</code></pre>
+
+<p>Enter a command even slower with <code>VERY_SLOW_TYPING_SPEED</code>. Compare to <code>type_string_very_slow</code>.</p>
+
 <h2 id="get_netboot_mirror">get_netboot_mirror</h2>
 
 <pre><code> get_netboot_mirror();</code></pre>
@@ -264,6 +291,12 @@
 
 <p>Run zypper search with given command line arguments and parse the output into an array of hashes.</p>
 
+<h2 id="set_zypper_lock_timeout">set_zypper_lock_timeout</h2>
+
+<pre><code> set_zypper_lock_timeout($timeout);</code></pre>
+
+<p>Set how many seconds zypper will wait for other processes to release the system lock. If this function is called without arguments, it&#39;ll set timeout to 300 seconds.</p>
+
 <h2 id="workaround_type_encrypted_passphrase">workaround_type_encrypted_passphrase</h2>
 
 <pre><code> workaround_type_encrypted_passphrase();</code></pre>
@@ -302,6 +335,8 @@
 
 <p>This will repeat <code>assert_and_click($mustmatch)</code> up to <code>$repeat</code> times, trying againg if the screen has not changed within <code>$wait_change</code> seconds after the <code>assert_and_click</code>. Returns the number of attempts made. <code>$wait_change</code> defaults to 2 (seconds) and <code>$repeat</code> defaults to 3.</p>
 
+<p>You can check if the screen changed by using an explicit repeat and comparing it to the returned number of attempts. If the value equals repeat the screen didn&#39;t change.</p>
+
 <h2 id="handle_livecd_reboot_failure">handle_livecd_reboot_failure</h2>
 
 <pre><code> handle_livecd_reboot_failure();</code></pre>
@@ -325,6 +360,12 @@
 <pre><code> quit_packagekit();</code></pre>
 
 <p>Stop and mask packagekit service and wait until it is really dead. This is needed to prevent access conflicts to the RPM database.</p>
+
+<h2 id="wait_for_purge_kernels">wait_for_purge_kernels</h2>
+
+<pre><code> wait_for_purge_kernels();</code></pre>
+
+<p>Wait until purge-kernels is done Prevent RPM lock e.g. SUSEConnect fail</p>
 
 <h2 id="addon_decline_license">addon_decline_license</h2>
 
@@ -440,6 +481,12 @@
 
 <p>Internal helper function used by <code>reconnect_mgmt_console</code>.</p>
 
+<h2 id="handle_firewall">_handle_firewall</h2>
+
+<pre><code> _handle_firewall();</code></pre>
+
+<p>Internal helper function used by <code>reconnect_mgmt_console</code>.</p>
+
 <h2 id="reconnect_mgmt_console">reconnect_mgmt_console</h2>
 
 <pre><code> reconnect_mgmt_console([timeout =&gt; $timeout]);</code></pre>
@@ -506,6 +553,22 @@
 
 <pre><code> script_output_retry(&#39;ping -c1 -W1 machine&#39;, retry =&gt; 5);</code></pre>
 
+<h2 id="validate_script_output_retry">validate_script_output_retry</h2>
+
+<pre><code> validate_script_output_retry($cmd, $check, [retry =&gt; $retry], [delay =&gt; $delay], [timeout =&gt; $timeout]);</code></pre>
+
+<p>Repeat command until validate_script_output succeeds or die. Return the output of the command on success.</p>
+
+<p><code>$retry</code> refers to the number of retries and defaults to <code>10</code>.</p>
+
+<p><code>$delay</code> is the time between retries and defaults to <code>30</code>.</p>
+
+<p>If the command doesn&#39;t succeed after <code>$retry</code> retries, this function will die.</p>
+
+<p>Example:</p>
+
+<pre><code> validate_script_output_retry(&#39;ping -c1 -W1 machine&#39;, m/1 packets transmitted/, retry =&gt; 5, delay =&gt; 60);</code></pre>
+
 <h2 id="script_run_interactive">script_run_interactive</h2>
 
 <pre><code> script_run_interactive($cmd, $prompt, $timeout);</code></pre>
@@ -531,6 +594,14 @@
 
 <p>Create btrfs subvolume for <code>/boot/grub2/arm64-efi</code> before migration. ref:bsc#1122591</p>
 
+<h2 id="create_raid_loop_device">create_raid_loop_device</h2>
+
+<pre><code> create_raid_loop_device([raid_type =&gt; $raid_type], [device_num =&gt; $device_num], [file_size =&gt; $file_size]);</code></pre>
+
+<p>Create a raid array over loop devices. Raid type is <code>$raid_type</code>, using <code>$device_num</code> number of loop device, with the size of each device being <code>$file_size</code> megabytes.</p>
+
+<p>Example to create a RAID <code>5</code> array over <code>3</code> loop devices, <code>200</code> Mb each: create_raid_loop_device(raid_type =&gt; 5, device_num =&gt; 3, file_size =&gt; 200)</p>
+
 <h2 id="file_content_replace">file_content_replace</h2>
 
 <pre><code> file_content_replace(&quot;filename&quot;,
@@ -555,6 +626,42 @@
 <h2 id="install_patterns-install_patterns">install_patterns install_patterns();</h2>
 
 <p>This functions install extra patterns if var PATTERNS is set.</p>
+
+<h2 id="permit_root_ssh-permit_root_ssh">permit_root_ssh permit_root_ssh();</h2>
+
+<p>Due to bsc#1173067, openssh now no longer allows RootLogin using password auth on Tumbleweed, the latest SLE16 and Leap16 will sync with Tumbleweed as well.</p>
+
+<h2 id="permit_root_ssh_in_sol-permit_root_ssh_in_sol">permit_root_ssh_in_sol permit_root_ssh_in_sol();</h2>
+
+<p>for ipmi backend, PermitRootLogin has to be set in sol console however, assert_script_run and script_run is not stable in sole console enter_cmd or type_string are acceptable</p>
+
+<h2 id="cleanup_disk_space-cleanup_disk_space">cleanup_disk_space cleanup_disk_space();</h2>
+
+<p>In fully_patch_system and minimal_patch_system, we&#39;ll create so many snapshots. which will cost large part of the disk space. We need to delete these snapshots before the migration only if the available space is less than DISK_LOW_WATERMARK.</p>
+
+<h2 id="package_upgrade_check-package_upgrade_check">package_upgrade_check package_upgrade_check();</h2>
+
+<p>This function is used for checking if the package is upgraded to the required version</p>
+
+<p>Sample config of parameter of the function below: my $pkg_list = {ibmtss =&gt; &#39;1.6.0&#39;}; here, &#39;libmtss&#39; is the package name, and &#39;1.6.0&#39; is target version which needs to be upgrated to</p>
+
+<h2 id="validate_result-_validate_result">_validate_result _validate_result();</h2>
+
+<p>This is a private method which is used by <code>generate_results</code> to convert the results in a string representation. At the moment the status that are supported are {PASS,FAIL}.</p>
+
+<p>The method takes as the only argument the return of a perl statement or subroutine.</p>
+
+<h2 id="generate_results-generate_results">generate_results generate_results();</h2>
+
+<p>This function is used to construct a hash suitable for representation in junit xml format.</p>
+
+<h2 id="pars_results-pars_results">pars_results pars_results();</h2>
+
+<p>Takes <code>test</code> as an argument. <code>test</code> is an array of hashes which contain the test results. They usually are generated by <code>generate_results</code>. Those are parsed and create the junit xml representation.</p>
+
+<h2 id="test_case-test_case-name-description-result">test_case test_case($name, $description, $result);</h2>
+
+<p><code>test_case</code> can produce a data_structure which <code>pars_results</code> can utilize. Using <code>test_case</code> in an OpenQA module you are able to /name/ and describe the whole test as subtasks, in a XUnit format.</p>
 
 
 </body>
