@@ -15,6 +15,7 @@
   <li><a href="#SYNOPSIS">SYNOPSIS</a>
     <ul>
       <li><a href="#az">az</a></li>
+      <li><a href="#az_validate_tags">_az_validate_tags</a></li>
       <li><a href="#az_version">az_version</a></li>
       <li><a href="#az_group_create">az_group_create</a></li>
       <li><a href="#az_group_name_get">az_group_name_get</a></li>
@@ -68,6 +69,7 @@
       <li><a href="#az_validate_uuid_pattern">az_validate_uuid_pattern</a></li>
       <li><a href="#az_storage_blob_upload">az_storage_blob_upload</a></li>
       <li><a href="#az_storage_blob_lease_acquire">az_storage_blob_lease_acquire</a></li>
+      <li><a href="#az_storage_blob_delete">az_storage_blob_delete</a></li>
       <li><a href="#az_storage_blob_list">az_storage_blob_list</a></li>
       <li><a href="#az_storage_blob_update">az_storage_blob_update</a></li>
       <li><a href="#az_keyvault_list">az_keyvault_list</a></li>
@@ -118,6 +120,72 @@
 <dd>
 
 </dd>
+<dt id="failok---Ignore-error-messages-and-return-result.-Default:-False"><b>failok</b> - Ignore error messages and return result. Default: False</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="az_validate_tags">_az_validate_tags</h2>
+
+<pre><code>_az_validate_tags(tags =&gt; &#39;name1=value1 name2=value2&#39; [, max_tags =&gt; 15, max_name_length =&gt; 128, strict_name =&gt; 1]);</code></pre>
+
+<p>Private function. Validate a string of tags before it goes into the <code>--tags</code> argument of an az cli command. The tags string is put in the shell command without quotes, so the function only accepts characters that the shell does not interpret. The function dies at the first rule that the tags do not obey. Rules:</p>
+
+<ul>
+
+<li><p>Tags are separated by the space character only. Other whitespace (newline, tab) is not permitted.</p>
+
+</li>
+<li><p>The format of each tag is <code>name=value</code>. The value can be empty. A value cannot contain spaces: the format cannot show where such a value stops.</p>
+
+</li>
+<li><p>Maximum <b>max_tags</b> tags.</p>
+
+</li>
+<li><p>The name cannot be empty and it is maximum <b>max_name_length</b> characters.</p>
+
+</li>
+<li><p>The name cannot contain <code>&lt; &gt; % &amp; \ ? /</code>.</p>
+
+</li>
+<li><p>The name contains only <code>A-Z a-z 0-9 _ . : -</code>.</p>
+
+</li>
+<li><p>The name cannot start with <code>-</code>. This prevents an injection of az cli options, like <code>--something</code>.</p>
+
+</li>
+<li><p>Two names cannot be equal, also with different case. Names are case-insensitive in Azure.</p>
+
+</li>
+<li><p>The value is maximum 256 characters.</p>
+
+</li>
+<li><p>The value contains only <code>A-Z a-z 0-9 _ . : @ + , / -</code>.</p>
+
+</li>
+</ul>
+
+<p>Tags are plain text in Azure. Do not put secrets in tags.</p>
+
+<dl>
+
+<dt id="tags---string-of-space-separated-name-value-tags"><b>tags</b> - string of space separated name=value tags</dt>
+<dd>
+
+</dd>
+<dt id="max_tags---maximum-number-of-tags.-Default-50.-Use-15-for-resources-that-support-only-15-tags-like-Azure-DNS-zones"><b>max_tags</b> - maximum number of tags. Default 50. Use 15 for resources that support only 15 tags, like Azure DNS zones.</dt>
+<dd>
+
+</dd>
+<dt id="max_name_length---maximum-length-of-a-tag-name.-Default-512.-Use-128-for-storage-accounts"><b>max_name_length</b> - maximum length of a tag name. Default 512. Use 128 for storage accounts.</dt>
+<dd>
+
+</dd>
+<dt id="strict_name---if-true-the-name-must-start-with-a-letter-and-contain-only-letters-digits-and-_.-Use-it-for-resources-with-stricter-rules-like-Azure-DNS-zones"><b>strict_name</b> - if true, the name must start with a letter and contain only letters, digits and <code>_</code>. Use it for resources with stricter rules, like Azure DNS zones.</dt>
+<dd>
+
+</dd>
 </dl>
 
 <h2 id="az_version">az_version</h2>
@@ -141,6 +209,10 @@
 
 </dd>
 <dt id="region---Azure-region-where-to-create-the-resource-group"><b>region</b> - Azure region where to create the resource group</dt>
+<dd>
+
+</dd>
+<dt id="tags---optional-string-of-space-separated-tags-to-apply-to-the-Azure-resources"><b>tags</b> - optional string of space separated tags to apply to the Azure resources</dt>
 <dd>
 
 </dd>
@@ -234,6 +306,10 @@
 <dd>
 
 </dd>
+<dt id="tags---optional-string-of-space-separated-tags-to-apply-to-the-virtual-network"><b>tags</b> - optional string of space separated tags to apply to the virtual network</dt>
+<dd>
+
+</dd>
 </dl>
 
 <h2 id="az_network_vnet_subnet_update">az_network_vnet_subnet_update</h2>
@@ -302,6 +378,10 @@
 <dd>
 
 </dd>
+<dt id="tags---optional-string-of-space-separated-tags-to-apply-to-the-NSG"><b>tags</b> - optional string of space separated tags to apply to the NSG</dt>
+<dd>
+
+</dd>
 </dl>
 
 <h2 id="az_network_nsg_rule_create">az_network_nsg_rule_create</h2>
@@ -365,6 +445,10 @@
 <dd>
 
 </dd>
+<dt id="tags---optional-string-of-space-separated-tags-to-apply-to-the-PubIP"><b>tags</b> - optional string of space separated tags to apply to the PubIP</dt>
+<dd>
+
+</dd>
 </dl>
 
 <h2 id="az_network_publicip_get">az_network_publicip_get</h2>
@@ -373,7 +457,7 @@
     resource_group =&gt; &#39;openqa-rg&#39;,
     name =&gt; &#39;openqa-pip&#39;)</code></pre>
 
-<p>Return an IPv4 public IP address from its name</p>
+<p>Return an IPv4 public IP address from its name or undef on failure.</p>
 
 <dl>
 
@@ -382,6 +466,10 @@
 
 </dd>
 <dt id="name---existing-public-IP-resource-name"><b>name</b> - existing public IP resource name</dt>
+<dd>
+
+</dd>
+<dt id="timeout---optional-command-timeout-in-seconds"><b>timeout</b> - optional command timeout in seconds</dt>
 <dd>
 
 </dd>
@@ -412,6 +500,10 @@
 
 </dd>
 <dt id="public_ip---add-to-the-NAT-Gateway-a-public-IP"><b>public_ip</b> - add to the NAT Gateway a public IP</dt>
+<dd>
+
+</dd>
+<dt id="tags---optional-string-of-space-separated-tags-to-the-NAT-Gateway"><b>tags</b> - optional string of space separated tags to the NAT Gateway</dt>
 <dd>
 
 </dd>
@@ -463,6 +555,10 @@
 
 </dd>
 <dt id="fip---optionally-add---private-ip-address"><b>fip</b> - optionally add --private-ip-address</dt>
+<dd>
+
+</dd>
+<dt id="tags---optional-string-of-space-separated-tags-to-apply-to-the-load-balancer"><b>tags</b> - optional string of space separated tags to apply to the load balancer</dt>
 <dd>
 
 </dd>
@@ -582,6 +678,10 @@
 <dd>
 
 </dd>
+<dt id="tags---optional-string-of-space-separated-tags-to-apply-to-the-availability-set"><b>tags</b> - optional string of space separated tags to apply to the availability set</dt>
+<dd>
+
+</dd>
 </dl>
 
 <h2 id="az_vm_as_list">az_vm_as_list</h2>
@@ -633,6 +733,10 @@
 
 </dd>
 <dt id="source---URI-of-the-vhd-disk-from-which-the-image-will-be-created"><b>source</b> - URI of the vhd disk from which the image will be created</dt>
+<dd>
+
+</dd>
+<dt id="tags---optional-string-of-space-separated-tags-to-apply-to-the-image"><b>tags</b> - optional string of space separated tags to apply to the image</dt>
 <dd>
 
 </dd>
@@ -722,7 +826,7 @@
 <dd>
 
 </dd>
-<dt id="tags---reference-to-a-list-of-tags-to-apply-to-the-VM"><b>tags</b> - reference to a list of tags to apply to the VM</dt>
+<dt id="tags---optional-string-of-space-separated-tags-to-apply-to-the-VM"><b>tags</b> - optional string of space separated tags to apply to the VM</dt>
 <dd>
 
 </dd>
@@ -914,6 +1018,10 @@
 <dd>
 
 </dd>
+<dt id="tags---optional-string-of-space-separated-tags-to-apply-to-the-NIC"><b>tags</b> - optional string of space separated tags to apply to the NIC</dt>
+<dd>
+
+</dd>
 </dl>
 
 <h2 id="az_nic_get">az_nic_get</h2>
@@ -990,7 +1098,7 @@
     nic_name =&gt; &#39;openqa-nic&#39;,
     ip =&gt; &#39;192.168.0.42&#39;)</code></pre>
 
-<p>Change the IpConfig to use a static IP</p>
+<p>Change the IpConfig to use a static IP. The command uses --debug, to get details about the Azure operation. Sometimes this operation takes about 10 minutes on the Azure side: if the command takes more than 60 seconds, a record_info with result fail reports the duration.</p>
 
 <dl>
 
@@ -1158,6 +1266,10 @@ Return a validated systemAssignedIdentity ID or die.</code></pre>
 
 </dd>
 <dt id="name---name-for-the-storage-account-to-be-created.-Storage-account-name-must-be-between-3-and-24-characters-in-length-and-use-numbers-and-lower-case-letters-only"><b>name</b> - name for the storage account to be created. Storage account name must be between 3 and 24 characters in length and use numbers and lower-case letters only.</dt>
+<dd>
+
+</dd>
+<dt id="tags---optional-string-of-space-separated-tags-to-apply-to-the-storage-account"><b>tags</b> - optional string of space separated tags to apply to the storage account</dt>
 <dd>
 
 </dd>
@@ -1481,6 +1593,41 @@ identifiers for Azure resources.</code></pre>
 <dd>
 
 </dd>
+<dt id="failok---Ignore-error-messages-and-return-result.-Default:-False1"><b>failok</b> - Ignore error messages and return result. Default: False</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="az_storage_blob_delete">az_storage_blob_delete</h2>
+
+<pre><code>az_storage_blob_delete(
+    container_name=&gt;&#39;somecontainer&#39;,
+    storage_account_name=&gt;&#39;storageaccount&#39;,
+    name=&gt;&#39;filename&#39;,
+    timeout =&gt; 120
+);</code></pre>
+
+<p>Delete blob file specified by <b>storage_account_name</b>, <b>container_name</b> and <b>name</b>. Returns az cli command exit code.</p>
+
+<dl>
+
+<dt id="container_name-Existing-storage-container-name2"><b>container_name</b> Existing storage container name.</dt>
+<dd>
+
+</dd>
+<dt id="storage_account_name-Storage-account-name2"><b>storage_account_name</b> Storage account name.</dt>
+<dd>
+
+</dd>
+<dt id="name-Blob-file-name"><b>name</b> Blob file name.</dt>
+<dd>
+
+</dd>
+<dt id="timeout-az-command-timeout:-default-of-wait_serial-https:-open.qa-api-testapi-script_output1"><b>timeout</b> az command timeout: default of `wait_serial` https://open.qa/api/testapi/#script_output</dt>
+<dd>
+
+</dd>
 </dl>
 
 <h2 id="az_storage_blob_list">az_storage_blob_list</h2>
@@ -1495,11 +1642,11 @@ identifiers for Azure resources.</code></pre>
 
 <dl>
 
-<dt id="container_name-Existing-storage-container-name2"><b>container_name</b> Existing storage container name.</dt>
+<dt id="container_name-Existing-storage-container-name3"><b>container_name</b> Existing storage container name.</dt>
 <dd>
 
 </dd>
-<dt id="storage_account_name-Storage-account-name2"><b>storage_account_name</b> Storage account name.</dt>
+<dt id="storage_account_name-Storage-account-name3"><b>storage_account_name</b> Storage account name.</dt>
 <dd>
 
 </dd>
@@ -1507,7 +1654,7 @@ identifiers for Azure resources.</code></pre>
 <dd>
 
 </dd>
-<dt id="timeout-az-command-timeout:-default-of-wait_serial-https:-open.qa-api-testapi-script_output1"><b>timeout</b> az command timeout: default of `wait_serial` https://open.qa/api/testapi/#script_output</dt>
+<dt id="timeout-az-command-timeout:-default-of-wait_serial-https:-open.qa-api-testapi-script_output2"><b>timeout</b> az command timeout: default of `wait_serial` https://open.qa/api/testapi/#script_output</dt>
 <dd>
 
 </dd>
@@ -1645,6 +1792,10 @@ identifiers for Azure resources.</code></pre>
 
 </dd>
 <dt id="name-Private-DNS-zone-name"><b>name</b> Private DNS zone name</dt>
+<dd>
+
+</dd>
+<dt id="tags-optional-string-of-space-separated-tags-to-apply-to-the-private-DNS-zone"><b>tags</b> optional string of space separated tags to apply to the private DNS zone</dt>
 <dd>
 
 </dd>
